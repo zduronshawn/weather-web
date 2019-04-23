@@ -1,0 +1,11 @@
+.display {
+  cursor: default;
+  height: 100%;
+}
+
+.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
