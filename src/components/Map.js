@@ -6,12 +6,12 @@ import * as D3Drag from "d3-drag";
 import * as D3Zoom from "d3-zoom";
 import _ from 'lodash'
 import { removeChildren, distance } from '../lib/utils'
+import * as cst from '../utils/constant'
 import styles from './globe.css'
 
-const MIN_MOVE = 4
-const REDRAW_WAIT = 10
 let coastline = null
 let lakes = null;
+
 export class Globe extends Component {
   static contextTypes = {
     globe: PropTypes.object
@@ -19,41 +19,50 @@ export class Globe extends Component {
 
   componentDidMount = () => {
     const { globe } = this.context
-    this.buildGlobe(globe, this.props.mesh)
+    this.buildGlobe(globe, this.props.mesh, this.view)
     let target = d3.select("#display")
     target.call(this._drag());
     target.call(this._zoom());
   }
-  removeOrignal = () => {
-    removeChildren(d3.select("#map").node());
-    // removeChildren(d3.select("#foreground").node());
+
+  componentWillReceiveProps = (newProps) => {
+    if (newProps.height !== this.props.height || newProps.width !== this.props.width) {
+      _.debounce(() => {
+        this.buildGlobe(this.context.globe, newProps.mesh, {
+          width: newProps.width,
+          height: newProps.height
+        })
+      }, 500)()
+    }
   }
+
   get path() {
     const { globe } = this.context
     return d3.geoPath().projection(globe.projection).pointRadius(7)
   }
-  buildGlobe = (globe, mesh) => {
+  get target() {
+    return d3.select("#display")
+  }
+  buildGlobe = (globe, mesh, view) => {
     const { configuration } = this.props
-    this.removeOrignal()
+    removeChildren(d3.select("#map").node());
     globe.defineMap(d3.select("#map"), d3.select("#foreground"));
-    globe.orientation(configuration.orientation, this.view)
+    globe.orientation(configuration.orientation, view)
     coastline = d3.select(".coastline");
     lakes = d3.select(".lakes");
     coastline.datum(mesh.coastHi);
     lakes.datum(mesh.lakesHi);
     d3.selectAll("path").attr("d", this.path);
   }
-  handleDragStart = () => {
+  // turn to use low resolution
+  handleMoving = () => {
     const { mesh } = this.props
     coastline.datum(mesh.coastLo);
     lakes.datum(mesh.lakesLo);
     d3.selectAll("path").attr("d", this.path);
-
   }
-  handleDraging = () => {
-    d3.selectAll("path").attr("d", this.path);
-  }
-  handleDragEnd = () => {
+  // back to use low resolution
+  handleMoveEnd = () => {
     const { mesh } = this.props
     coastline.datum(mesh.coastHi);
     lakes.datum(mesh.lakesHi);
@@ -69,51 +78,56 @@ export class Globe extends Component {
   }
   _drag = () => {
     const { globe } = this.context
-    const that = this
     let op = null
     return D3Drag.drag()
-      .on("start", function () {
-        op = op || that.newOp(d3.mouse(this), globe.projection.scale())
+      .on("start", () => {
+        op = op || this.newOp(d3.mouse(this.target.node()), globe.projection.scale())
       })
-      .on("drag", function () {
-        let currentMouse = d3.mouse(this)
-        op = op || that.newOp(currentMouse, globe.projection.scale())
+      .on("drag", () => {
+        let currentMouse = d3.mouse(this.target.node())
+        op = op || this.newOp(currentMouse, globe.projection.scale())
         let distanceMoved = distance(currentMouse, op.startMouse);
-        if (distanceMoved > MIN_MOVE) {
+        if (distanceMoved > cst.MIN_MOVE) {
           op.manipulator.move(currentMouse);
-          let doDraw_throttled = _.throttle(that.handleDragStart, REDRAW_WAIT, { leading: false });
+          let doDraw_throttled = _.throttle(this.handleMoving, cst.REDRAW_WAIT, { leading: false });
           doDraw_throttled()
         }
-      }).on("end", function () {
+      }).on("end", () => {
         op.manipulator.end();
         _.debounce(() => {
           if (!op) {
-            that.handleDragEnd()
+            // save the orientation after draging
+            this.props.dispatch({
+              type: "configuration/save",
+              payload: {
+                orientation: globe.orientation()
+              }
+            })
+            this.handleMoveEnd()
           }
-        }, 1000)()
+        }, cst.MOVE_END_WAIT)()
         op = null
       })
   }
 
   _zoom = () => {
     const { globe } = this.context
-    const that = this
     let op = null
     let zoom = D3Zoom.zoom()
       .scaleExtent(globe.scaleExtent())
-      .on("start", function () {
-        op = op || that.newOp(null, d3.event.transform.k)
+      .on("start", () => {
+        op = op || this.newOp(null, d3.event.transform.k)
       })
-      .on("zoom", function () {
+      .on("zoom", () => {
         op.manipulator.move(null, d3.event.transform.k)
-        let doDraw_throttled = _.throttle(that.handleDragStart, REDRAW_WAIT, { leading: false });
+        let doDraw_throttled = _.throttle(this.handleMoving, cst.REDRAW_WAIT, { leading: false });
         doDraw_throttled()
       })
-      .on("end", function () {
+      .on("end", () => {
         op.manipulator.end();
         _.debounce(() => {
           if (!op) {
-            that.handleDragEnd()
+            this.handleMoveEnd()
           }
         }, 1000)()
         op = null

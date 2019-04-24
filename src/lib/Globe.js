@@ -57,7 +57,7 @@ class Globe {
    * @param [o] the orientation string
    * @param [view] the size of the view as {width:, height:}.
    */
-  orientation = (o, view) => {
+  orientation = (o) => {
     let projection = this.projection, rotate = projection.rotate();
     if (isValue(o)) {
       let parts = o.split(","), λ = +parts[0], φ = +parts[1], scale = +parts[2];
