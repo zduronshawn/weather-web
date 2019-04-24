@@ -34,6 +34,9 @@ class Globe {
     var vScale = (bounds[1][1] - bounds[0][1]) / defaultProjection.scale();
     return Math.min(this.view.width / hScale, this.view.height / vScale) * 0.9;
   }
+  bounds = (view) => {
+    return clampedBounds(d3.geoPath().projection(this.projection).bounds({ type: "Sphere" }), view);
+  }
   _clampedBounds(bounds, view) {
     var upperLeft = bounds[0];
     var lowerRight = bounds[1];

@@ -10,7 +10,7 @@ import { removeChildren, distance } from '../lib/utils'
 import styles from './globe.css'
 
 const MIN_MOVE = 4
-const REDRAW_WAIT = 5
+const REDRAW_WAIT = 10
 let globe = null
 let coastline = null
 let lakes = null;
@@ -96,19 +96,23 @@ export class Globe extends Component {
     let op = null
     let zoom = D3Zoom.zoom()
       .scaleExtent(globe.scaleExtent())
+      .scale()
       .on("start", function () {
         console.log("zoom start")
-        op = op || that.newOp(null, d3.event.transform.k)
+        op = op || that.newOp(null, d3.event.transform.k == 1 ? 400 : d3.event.transform.k)
       })
       .on("zoom", function () {
         console.log(d3.event.transform.k)
         op.manipulator.move(null, d3.event.transform.k)
-        let doDraw_throttled = _.throttle(that.handleDraging, REDRAW_WAIT, { leading: false });
+        let doDraw_throttled = _.throttle(that.handleDragStart, REDRAW_WAIT, { leading: false });
         doDraw_throttled()
       })
       .on("end", function () {
         op.manipulator.end();
-        that.handleDragEnd()
+        _.debounce(() => {
+          console.log("toHigh")
+          that.handleDragEnd()
+        }, 1000)()
         op = null
       })
     return zoom

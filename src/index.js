@@ -13,6 +13,7 @@ const app = dva({
 // 3. Model
 app.model(require('./models/app').default);
 app.model(require('./models/download').default);
+app.model(require('./models/configuration').default);
 
 // 4. Router
 app.router(require('./router').default);
