@@ -7,6 +7,7 @@ const app = dva({
   history: createBrowserHistory()
 });
 
+window.__dvaApp = app
 // 2. Plugins
 // app.use({});
 

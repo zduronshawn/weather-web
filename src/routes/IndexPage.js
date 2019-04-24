@@ -11,15 +11,12 @@ class IndexPage extends Component {
     })
   }
   render() {
-    const { mesh } = this.props
     return (
       <div className={styles.normal}>
-        {mesh && <Globle mesh={mesh}></Globle>}
+        <Globle></Globle>
       </div>
     )
   }
 }
 
-export default connect(({ download }) => ({
-  mesh: download.mesh
-}))(IndexPage);
+export default connect(null)(IndexPage);

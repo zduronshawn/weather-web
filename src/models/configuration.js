@@ -2,10 +2,10 @@ export default {
   namespace: 'configuration',
   state: {
     date: Date.now(),
-    orentation: "-222.73,1.75,275",
+    orientation: "-222.73,1.75,275",
     overlaytype: "default",
     params: "wind",
-    projection: "orthographic",
+    projection: "Orthographic",
     topology: '/public/data/earth-topo.json'
   },
 

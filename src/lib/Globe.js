@@ -7,7 +7,7 @@ console.log("geo", d3Geo)
 class Globe {
   constructor(view) {
     this.view = view //需要线赋值view，下面this.center中会用到this.view
-    this.projection = this.newProjection().translate(this.center(view))
+    this.projection = this.newProjection()
   }
 
   projection = null
@@ -20,7 +20,7 @@ class Globe {
 
   //根据时区获取当前位置，在有些投影的初始化位置
   _currentPosition() {
-    var λ = floorMod(new Date().getTimezoneOffset() / 4, 360);  // 24 hours * 60 min / 4 === 360 degrees
+    let λ = floorMod(new Date().getTimezoneOffset() / 4, 360);  // 24 hours * 60 min / 4 === 360 degrees
     return [λ, 0];
   }
 
@@ -28,26 +28,26 @@ class Globe {
     return _.isFinite(num) || num === Infinity || num === -Infinity ? num : fallback;
   }
   _fit = (view) => {
-    var defaultProjection = this.newProjection(this.view);
-    var bounds = d3Geo.geoPath().projection(defaultProjection).bounds({ type: "Sphere" });
-    var hScale = (bounds[1][0] - bounds[0][0]) / defaultProjection.scale();
-    var vScale = (bounds[1][1] - bounds[0][1]) / defaultProjection.scale();
+    let defaultProjection = this.newProjection(this.view);
+    let bounds = d3Geo.geoPath().projection(defaultProjection).bounds({ type: "Sphere" });
+    let hScale = (bounds[1][0] - bounds[0][0]) / defaultProjection.scale();
+    let vScale = (bounds[1][1] - bounds[0][1]) / defaultProjection.scale();
     return Math.min(this.view.width / hScale, this.view.height / vScale) * 0.9;
   }
   bounds = (view) => {
-    return clampedBounds(d3.geoPath().projection(this.projection).bounds({ type: "Sphere" }), view);
+    return this._clampedBounds(d3Geo.geoPath().projection(this.projection).bounds({ type: "Sphere" }), view);
   }
   _clampedBounds(bounds, view) {
-    var upperLeft = bounds[0];
-    var lowerRight = bounds[1];
-    var x = Math.max(Math.floor(this._ensureNumber(upperLeft[0], 0)), 0);
-    var y = Math.max(Math.floor(this._ensureNumber(upperLeft[1], 0)), 0);
-    var xMax = Math.min(Math.ceil(this._ensureNumber(lowerRight[0], view.width)), view.width - 1);
-    var yMax = Math.min(Math.ceil(this._ensureNumber(lowerRight[1], view.height)), view.height - 1);
+    let upperLeft = bounds[0];
+    let lowerRight = bounds[1];
+    let x = Math.max(Math.floor(this._ensureNumber(upperLeft[0], 0)), 0);
+    let y = Math.max(Math.floor(this._ensureNumber(upperLeft[1], 0)), 0);
+    let xMax = Math.min(Math.ceil(this._ensureNumber(lowerRight[0], view.width)), view.width - 1);
+    let yMax = Math.min(Math.ceil(this._ensureNumber(lowerRight[1], view.height)), view.height - 1);
     return { x: x, y: y, xMax: xMax, yMax: yMax, width: xMax - x + 1, height: yMax - y + 1 };
   }
   scaleExtent = () => {
-    return [25, 3000];
+    return [300, 3000];
   }
 
   /**
@@ -58,16 +58,16 @@ class Globe {
    * @param [view] the size of the view as {width:, height:}.
    */
   orientation = (o, view) => {
-    var projection = this.projection, rotate = projection.rotate();
+    let projection = this.projection, rotate = projection.rotate();
     if (isValue(o)) {
-      var parts = o.split(","), λ = +parts[0], φ = +parts[1], scale = +parts[2];
-      var extent = this.scaleExtent();
+      let parts = o.split(","), λ = +parts[0], φ = +parts[1], scale = +parts[2];
+      let extent = this.scaleExtent();
       projection.rotate(_.isFinite(λ) && _.isFinite(φ) ?
         [-λ, -φ, rotate[2]] :
         this.newProjection(this.view).rotate());
       let scaleNum = _.isFinite(scale) ? clamp(scale, extent[0], extent[1]) : this._fit(this.view)
       projection.scale(scaleNum);
-      projection.translate(this.center(view));
+      projection.translate(this.center(this.view));
       return this;
     }
     return [(-rotate[0]).toFixed(2), (-rotate[1]).toFixed(2), Math.round(projection.scale())].join(",");
@@ -77,8 +77,8 @@ class Globe {
   }
   // 绘制地图
   defineMap = (mapSvg, foregroundSvg) => {
-    var path = d3Geo.geoPath().projection(this.projection);
-    var defs = mapSvg.append("defs");
+    let path = d3Geo.geoPath().projection(this.projection);
+    let defs = mapSvg.append("defs");
     //定义复用的sphere，在下面通过use复用
     defs.append("path")
       .attr("id", "sphere")
@@ -108,16 +108,16 @@ class Globe {
   }
 
   manipulator = (startMouse, startScale) => {
-    var projection = this.projection;
-    var sensitivity = 60 / startScale;  // seems to provide a good drag scaling factor
-    var rotation = [projection.rotate()[0], -projection.rotate()[1]];
-    var original = projection.precision();
+    let projection = this.projection;
+    let sensitivity = 60 / startScale;  // seems to provide a good drag scaling factor
+    let rotation = [projection.rotate()[0], -projection.rotate()[1]];
+    let original = projection.precision();
     projection.precision(original * 10);
     return {
       move: function (mouse, scale) {
         if (mouse) {
-          var xd = (mouse[0] - startMouse[0]) * sensitivity + rotation[0];
-          var yd = (mouse[1] - startMouse[1]) * sensitivity + rotation[1];
+          let xd = (mouse[0] - startMouse[0]) * sensitivity + rotation[0];
+          let yd = (mouse[1] - startMouse[1]) * sensitivity + rotation[1];
           projection.rotate([xd, -yd, projection.rotate()[2]]);
         }
         if (scale) {
@@ -161,9 +161,9 @@ class Orthographic extends Globe {
     return d3Geo.geoOrthographic().rotate(this._currentPosition()).precision(0.1).clipAngle(90);
   }
   defineMap = (mapSvg, foregroundSvg) => {
-    var path = d3Geo.geoPath().projection(this.projection);
-    var defs = mapSvg.append("defs");
-    var gradientFill = defs.append("radialGradient")
+    let path = d3Geo.geoPath().projection(this.projection);
+    let defs = mapSvg.append("defs");
+    let gradientFill = defs.append("radialGradient")
       .attr("id", "orthographic-fill")
       .attr("gradientUnits", "objectBoundingBox")
       .attr("cx", "50%").attr("cy", "49%").attr("r", "50%");
