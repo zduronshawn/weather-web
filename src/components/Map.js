@@ -129,7 +129,7 @@ export class Globe extends Component {
           if (!op) {
             this.handleMoveEnd()
           }
-        }, 1000)()
+        }, cst.MOVE_END_WAIT)()
         op = null
       })
     return zoom

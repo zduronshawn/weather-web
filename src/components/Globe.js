@@ -24,7 +24,6 @@ export class Globe extends Component {
     const { mesh } = this.props
     return (
       <div id="display" className={styles.display}>
-        {/* <svg id="map" className={styles.layer} xmlns="http://www.w3.org/2000/svg" version="1.1" {...this.view}></svg> */}
         {mesh && <Map mesh={mesh} {...this.view}></Map>}
         <canvas id="animation" className={styles.layer} {...this.view}></canvas>
         <canvas id="overlay" className={styles.layer} {...this.view}></canvas>
