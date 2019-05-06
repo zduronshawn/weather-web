@@ -1,3 +1,6 @@
+import * as Globes from '../lib/Globe'
+import { clearCanvas } from '../lib/utils'
+import * as d3 from 'd3'
 function getView() {
   var w = window;
   var d = document && document.documentElement;
@@ -15,15 +18,23 @@ const defaultView = getView()
 export default {
   namespace: 'app',
   state: {
+    view: defaultView,
     width: defaultView.width,
-    height: defaultView.height
+    height: defaultView.height,
+    globe: new Globes["Orthographic"](defaultView)
   },
   subscriptions: {
     setup({ dispatch, history }) {  // eslint-disable-line
       window.onresize = () => {
+        clearCanvas(d3.select("#animation").node())
+        clearCanvas(d3.select("#overlay").node());
+        let view = getView()
         dispatch({
           type: "save",
-          payload: getView()
+          payload: {
+            view,
+            ...getView()
+          }
         })
       }
     },

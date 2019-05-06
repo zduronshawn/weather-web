@@ -34,9 +34,7 @@ class Globe {
     let vScale = (bounds[1][1] - bounds[0][1]) / defaultProjection.scale();
     return Math.min(this.view.width / hScale, this.view.height / vScale) * 0.9;
   }
-  bounds = (view) => {
-    return this._clampedBounds(d3Geo.geoPath().projection(this.projection).bounds({ type: "Sphere" }), view);
-  }
+  
   _clampedBounds(bounds, view) {
     let upperLeft = bounds[0];
     let lowerRight = bounds[1];
@@ -49,7 +47,10 @@ class Globe {
   scaleExtent = () => {
     return [300, 3000];
   }
-
+  
+  bounds = (view) => {
+    return this._clampedBounds(d3Geo.geoPath().projection(this.projection).bounds({ type: "Sphere" }), view);
+  }
   /**
    * Returns the current orientation of this globe as a string. If the arguments are specified,
    * mutates this globe to match the specified orientation string, usually in the form "lat,lon,scale".
@@ -96,7 +97,7 @@ class Globe {
     //赤道
     mapSvg.append("path")
       .attr("class", "hemisphere")
-      .datum(d3Geo.geoGraticule().minorStep([0, 90]).majorStep([0, 90]))
+      .datum(d3Geo.geoGraticule().stepMinor([0, 90]).stepMajor([0, 90]))
       .attr("d", path);
     mapSvg.append("path")
       .attr("class", "coastline");
@@ -134,7 +135,7 @@ class Globe {
    * @returns {Array} the range at which this globe can be zoomed.
    */
   scaleExtent = () => {
-    return [25, 3000];
+    return [300, 3000];
   }
 
   locate = (coord) => {
@@ -147,16 +148,7 @@ class Globe {
   }
 }
 
-// class Atlantis extends Globe {
-//   newProjection() {
-//     return d3Geo.mollweide().rotate([30, -45, 90]).precision(0.1);
-//   }
-// }
-
 class Orthographic extends Globe {
-  // constructor(props) {
-  //   super(props)
-  // }
   newProjection() {
     return d3Geo.geoOrthographic().rotate(this._currentPosition()).precision(0.1).clipAngle(90);
   }
@@ -198,7 +190,14 @@ class Orthographic extends Globe {
   }
 }
 
+class Equirectangular extends Globe {
+  newProjection() {
+    return d3Geo.geoEquirectangular().rotate(this._currentPosition()).precision(0.1);
+  }
+}
+
 export {
   // Atlantis,
-  Orthographic
+  Orthographic,
+  Equirectangular
 }

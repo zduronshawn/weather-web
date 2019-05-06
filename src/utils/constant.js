@@ -8,8 +8,8 @@ export const MOVE_END_WAIT = 150;                 // time to wait for a move ope
 
 export const OVERLAY_ALPHA = Math.floor(0.4 * 255);  // overlay transparency (on scale [0, 255])
 export const INTENSITY_SCALE_STEP = 10;            // step size of particle intensity color scale
-export const MAX_PARTICLE_AGE = 1000;               // max number of frames a particle is drawn before regeneration
-export const PARTICLE_LINE_WIDTH = 0.8;            // line width of a drawn particle
+export const MAX_PARTICLE_AGE = 100;               // max number of frames a particle is drawn before regeneration
+export const PARTICLE_LINE_WIDTH = 1;            // line width of a drawn particle
 export const PARTICLE_MULTIPLIER = 7;              // particle count scalar (completely arbitrary--this values looks nice)
 export const PARTICLE_REDUCTION = 0.75;            // reduce particle count to this much of normal for mobile devices
 export const FRAME_RATE = 40;                      // desired milliseconds per frame

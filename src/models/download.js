@@ -1,8 +1,9 @@
-import { getMesh } from '../services/app'
+import { getMesh, getWeather } from '../services/app'
 export default {
   namespace: 'download',
   state: {
-    mesh: null
+    mesh: null,
+
   },
 
   effects: {
@@ -12,6 +13,10 @@ export default {
         type: "save",
         payload: { mesh }
       })
+    },
+    *getWeather({ payload }, { call, put }) {  // eslint-disable-line
+      const result = yield call(getWeather, payload)
+      return result
     },
   },
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import Globle from '../components/Globe'
+import Panel from '../components/Panel'
 import styles from './IndexPage.css';
 
 class IndexPage extends Component {
@@ -14,6 +15,7 @@ class IndexPage extends Component {
     return (
       <div className={styles.normal}>
         <Globle></Globle>
+        <Panel></Panel>
       </div>
     )
   }

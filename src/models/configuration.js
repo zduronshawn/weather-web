@@ -1,12 +1,14 @@
+import moment from 'moment'
+
 export default {
   namespace: 'configuration',
   state: {
-    date: Date.now(),
+    date: moment().subtract(3, 'days').format("YYYYMMDD"),
     orientation: "-222.73,1.75,275",
     overlaytype: "default",
     params: "wind",
     projection: "Orthographic",
-    topology: '/public/data/earth-topo.json'
+    topology: '/public/data/earth-topo.json',
   },
 
   effects: {},

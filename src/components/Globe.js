@@ -1,30 +1,50 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import { connect } from 'dva';
 import styles from './globe.css'
 import Map from './Map'
-import * as GlobeLib from '../lib/Globe'
+import Field from './Field'
+import { clearCanvas } from '../lib/utils'
+import * as d3 from 'd3'
 
 export class Globe extends Component {
-  static childContextTypes = {
-    globe: PropTypes.object
+
+  state = {
+    mapRenderState: 0
   }
-  getChildContext() {
-    return {
-      globe: new GlobeLib[this.props.projection](this.view)
-    }
-  }
+
   get view() {
     return {
       width: this.props.width,
       height: this.props.height,
     }
   }
+
+  handleStartMap = () => {
+    this.setState({
+      mapRenderState: 0
+    })
+  }
+  handleEndMap = () => {
+    this.setState({
+      mapRenderState: 1
+    })
+  }
   render() {
     const { mesh } = this.props
+    const { mapRenderState } = this.state
     return (
       <div id="display" className={styles.display}>
-        {mesh && <Map mesh={mesh} {...this.view}></Map>}
+        {
+          mesh &&
+          <Map
+            {...this.view}
+            mesh={mesh}
+            onStart={this.handleStartMap}
+            onEnd={this.handleEndMap}></Map>}
+        {
+          mapRenderState === 1 &&
+          <Field mapRenderState={mapRenderState}></Field>
+        }
         <canvas id="animation" className={styles.layer} {...this.view}></canvas>
         <canvas id="overlay" className={styles.layer} {...this.view}></canvas>
         <svg id="foreground" className={styles.layer} xmlns="http://www.w3.org/2000/svg" version="1.1" {...this.view}></svg>

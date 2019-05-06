@@ -12,13 +12,10 @@ import styles from './globe.css'
 let coastline = null
 let lakes = null;
 
-export class Globe extends Component {
-  static contextTypes = {
-    globe: PropTypes.object
-  }
+export class Map extends Component {
 
   componentDidMount = () => {
-    const { globe } = this.context
+    const { globe } = this.props
     this.buildGlobe(globe, this.props.mesh, this.view)
     let target = d3.select("#display")
     target.call(this._drag());
@@ -28,7 +25,15 @@ export class Globe extends Component {
   componentWillReceiveProps = (newProps) => {
     if (newProps.height !== this.props.height || newProps.width !== this.props.width) {
       _.debounce(() => {
-        this.buildGlobe(this.context.globe, newProps.mesh, {
+        this.buildGlobe(newProps.globe, newProps.mesh, {
+          width: newProps.width,
+          height: newProps.height
+        })
+      }, 500)()
+    }
+    if (newProps.globe.projection !== this.props.globe.projection) {
+      _.debounce(() => {
+        this.buildGlobe(newProps.globe, newProps.mesh, {
           width: newProps.width,
           height: newProps.height
         })
@@ -37,14 +42,15 @@ export class Globe extends Component {
   }
 
   get path() {
-    const { globe } = this.context
+    const { globe } = this.props
     return d3.geoPath().projection(globe.projection).pointRadius(7)
   }
   get target() {
     return d3.select("#display")
   }
   buildGlobe = (globe, mesh, view) => {
-    const { configuration } = this.props
+    const { configuration, onStart, onEnd } = this.props
+    onStart()
     removeChildren(d3.select("#map").node());
     globe.defineMap(d3.select("#map"), d3.select("#foreground"));
     globe.orientation(configuration.orientation, view)
@@ -53,6 +59,7 @@ export class Globe extends Component {
     coastline.datum(mesh.coastHi);
     lakes.datum(mesh.lakesHi);
     d3.selectAll("path").attr("d", this.path);
+    onEnd()
   }
   // turn to use low resolution
   handleMoving = () => {
@@ -63,13 +70,14 @@ export class Globe extends Component {
   }
   // back to use low resolution
   handleMoveEnd = () => {
-    const { mesh } = this.props
+    const { mesh, onEnd } = this.props
     coastline.datum(mesh.coastHi);
     lakes.datum(mesh.lakesHi);
     d3.selectAll("path").attr("d", this.path);
+    onEnd()
   }
   newOp(startMouse, startScale) {
-    const { globe } = this.context
+    const { globe } = this.props
     return {
       startMouse: startMouse,
       startScale: startScale,
@@ -77,10 +85,12 @@ export class Globe extends Component {
     };
   }
   _drag = () => {
-    const { globe } = this.context
+    const { globe } = this.props
+    const { onStart, onEnd } = this.props
     let op = null
     return D3Drag.drag()
       .on("start", () => {
+        onStart()
         op = op || this.newOp(d3.mouse(this.target.node()), globe.projection.scale())
       })
       .on("drag", () => {
@@ -106,16 +116,19 @@ export class Globe extends Component {
             this.handleMoveEnd()
           }
         }, cst.MOVE_END_WAIT)()
+        onEnd()
         op = null
       })
   }
 
   _zoom = () => {
-    const { globe } = this.context
+    const { globe } = this.props
+    const { onStart, onEnd } = this.props
     let op = null
     let zoom = D3Zoom.zoom()
       .scaleExtent(globe.scaleExtent())
       .on("start", () => {
+        onStart()
         op = op || this.newOp(null, d3.event.transform.k)
       })
       .on("zoom", () => {
@@ -150,7 +163,8 @@ export class Globe extends Component {
 }
 
 export default connect(({ app, configuration }) => ({
+  globe: app.globe,
   width: app.width,
   height: app.height,
   configuration
-}))(Globe)
+}))(Map)

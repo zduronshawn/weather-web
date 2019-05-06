@@ -1,8 +1,12 @@
 import request from '../utils/request';
 import * as topojson from 'topojson'
 
-export function query() {
-  return request('http://localhost:3000/wind/20190403');
+export function getWeather(param) {
+
+  return request(`http://localhost:3000/${param.type}/${param.date}`)
+    .then(({ data }) => {
+      return data
+    })
 }
 
 export function getMesh() {
