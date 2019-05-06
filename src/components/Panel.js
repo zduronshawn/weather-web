@@ -10,19 +10,19 @@ class Panel extends Component {
       payload
     })
   }
+  handleChangeProjection = (projectionName) => {
+    this.props.dispatch({
+      type: "app/save",
+      payload: {
+        globe: new Globes[projectionName](this.props.view)
+      }
+    })
+  }
   render() {
     return (
       <div className={styles.layer}>
-        <button>O</button>
-        <button onClick={(e) => {
-          this.handleChangeConfig(e, {
-            projection: "Equirectangular",
-          })
-          this.props.dispatch({
-            type: "app/save",
-            payload: new Globes["Equirectangular"](this.props.view)
-          })
-        }}>EQ</button>
+        <button onClick={() => this.handleChangeProjection("Orthographic")}>O</button>
+        <button onClick={() => this.handleChangeProjection("Equirectangular")}>EQ</button>
       </div>
     )
   }

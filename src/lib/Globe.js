@@ -34,7 +34,7 @@ class Globe {
     let vScale = (bounds[1][1] - bounds[0][1]) / defaultProjection.scale();
     return Math.min(this.view.width / hScale, this.view.height / vScale) * 0.9;
   }
-  
+
   _clampedBounds(bounds, view) {
     let upperLeft = bounds[0];
     let lowerRight = bounds[1];
@@ -47,7 +47,7 @@ class Globe {
   scaleExtent = () => {
     return [300, 3000];
   }
-  
+
   bounds = (view) => {
     return this._clampedBounds(d3Geo.geoPath().projection(this.projection).bounds({ type: "Sphere" }), view);
   }
@@ -149,6 +149,7 @@ class Globe {
 }
 
 class Orthographic extends Globe {
+  projectionName = "Orthographic"
   newProjection() {
     return d3Geo.geoOrthographic().rotate(this._currentPosition()).precision(0.1).clipAngle(90);
   }
@@ -191,8 +192,12 @@ class Orthographic extends Globe {
 }
 
 class Equirectangular extends Globe {
+  projectionName = "Equirectangular"
   newProjection() {
     return d3Geo.geoEquirectangular().rotate(this._currentPosition()).precision(0.1);
+  }
+  scaleExtent = () => {
+    return [200, 3000];
   }
 }
 

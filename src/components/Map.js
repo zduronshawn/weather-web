@@ -31,13 +31,11 @@ export class Map extends Component {
         })
       }, 500)()
     }
-    if (newProps.globe.projection !== this.props.globe.projection) {
-      _.debounce(() => {
-        this.buildGlobe(newProps.globe, newProps.mesh, {
-          width: newProps.width,
-          height: newProps.height
-        })
-      }, 500)()
+    if (newProps.globe.projectionName !== this.props.globe.projectionName) {
+      this.buildGlobe(newProps.globe, newProps.mesh, {
+        width: newProps.width,
+        height: newProps.height
+      })
     }
   }
 
@@ -58,7 +56,7 @@ export class Map extends Component {
     lakes = d3.select(".lakes");
     coastline.datum(mesh.coastHi);
     lakes.datum(mesh.lakesHi);
-    d3.selectAll("path").attr("d", this.path);
+    d3.selectAll("path").attr("d", d3.geoPath().projection(globe.projection).pointRadius(7)); //fix update proejction bug
     onEnd()
   }
   // turn to use low resolution

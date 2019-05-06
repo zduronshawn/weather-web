@@ -22,9 +22,8 @@ function distort(projection, λ, φ, x, y, scale, wind) {
 
 class FieldCmp extends Component {
 
-  componentDidMount = () => {
+  renderField = (globe) => {
     const { configuration } = this.props
-    const { globe } = this.props
     this.props.dispatch({
       type: "download/getWeather",
       payload: {
@@ -44,11 +43,15 @@ class FieldCmp extends Component {
     })
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   if (nextProps.globe) {
-
-  //   }
-  // }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.mapRenderState === 1 && this.props.mapRenderState === 0) {
+      this.renderField(nextProps.globe)
+    }
+    if (nextProps.globe.projectionName !== this.props.globe.projectionName) {
+      this.field.release()
+      this.renderField()
+    }
+  }
   interpolateField(globe, grids) {
     if (!globe || !grids) return null;
     let that = this
@@ -103,18 +106,18 @@ class FieldCmp extends Component {
       }
       (function batchInterpolate() {
         try {
-          // if (!cancel.requested) {
-          var start = Date.now();
-          while (x < bounds.xMax) {
-            interpolateColumn(x);
-            x += 2;
-            if ((Date.now() - start) > cst.MAX_TASK_TIME) {
-              // Interpolation is taking too long. Schedule the next batch for later and yield.
-              setTimeout(batchInterpolate, cst.MIN_SLEEP_TIME);
-              return;
+          if (that.props.mapRenderState === 1) {
+            var start = Date.now();
+            while (x < bounds.xMax) {
+              interpolateColumn(x);
+              x += 2;
+              if ((Date.now() - start) > cst.MAX_TASK_TIME) {
+                // Interpolation is taking too long. Schedule the next batch for later and yield.
+                setTimeout(batchInterpolate, cst.MIN_SLEEP_TIME);
+                return;
+              }
             }
           }
-          // }
           resolve(new Field(columns, bounds, mask));
         }
         catch (e) {
@@ -202,9 +205,13 @@ class FieldCmp extends Component {
       });
     }
 
-
+    let that = this;
     (function frame() {
       try {
+        if (that.props.mapRenderState === 0) {
+          field.release()
+          return
+        }
         evolve();
         draw();
         setTimeout(frame, cst.FRAME_RATE);
@@ -228,7 +235,6 @@ class FieldCmp extends Component {
     if (this.field) {
       this.field.release()
     }
-    clearTimeout(this.frameTimer)
     clearCanvas(d3.select("#animation").node())
     clearCanvas(d3.select("#overlay").node());
   }

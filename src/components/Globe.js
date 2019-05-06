@@ -23,6 +23,8 @@ export class Globe extends Component {
     this.setState({
       mapRenderState: 0
     })
+    clearCanvas(d3.select("#animation").node())
+    clearCanvas(d3.select("#overlay").node());
   }
   handleEndMap = () => {
     this.setState({
@@ -41,10 +43,7 @@ export class Globe extends Component {
             mesh={mesh}
             onStart={this.handleStartMap}
             onEnd={this.handleEndMap}></Map>}
-        {
-          mapRenderState === 1 &&
-          <Field mapRenderState={mapRenderState}></Field>
-        }
+        <Field mapRenderState={mapRenderState}></Field>
         <canvas id="animation" className={styles.layer} {...this.view}></canvas>
         <canvas id="overlay" className={styles.layer} {...this.view}></canvas>
         <svg id="foreground" className={styles.layer} xmlns="http://www.w3.org/2000/svg" version="1.1" {...this.view}></svg>
@@ -54,6 +53,7 @@ export class Globe extends Component {
 }
 
 export default connect(({ app, download, configuration }) => ({
+  globe: app.globe,
   width: app.width,
   height: app.height,
   mesh: download.mesh,
