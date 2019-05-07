@@ -43,6 +43,42 @@ const Factory = {
       }
     },
     particles: { velocityScale: 1 / 60000, maxIntensity: 17 }
+  },
+  "temp": {
+    field: "scalar",
+    type: "temp",
+    description: "温度",
+    builder: function (file) {
+      var record = file[0], data = record.data;
+      return {
+        header: record.header,
+        interpolate: bilinearInterpolateScalar,
+        data: function (i) {
+          return data[i];
+        }
+      }
+    },
+    units: [
+      { label: "°C", conversion: function (x) { return x - 273.15; }, precision: 1 },
+      { label: "°F", conversion: function (x) { return x * 9 / 5 - 459.67; }, precision: 1 },
+      { label: "K", conversion: function (x) { return x; }, precision: 1 }
+    ],
+    scale: {
+      bounds: [193, 328],
+      gradient: µ.segmentedColorScale([
+        [193, [37, 4, 42]],
+        [206, [41, 10, 130]],
+        [219, [81, 40, 40]],
+        [233.15, [192, 37, 149]],  // -40 C/F
+        [255.372, [70, 215, 215]],  // 0 F
+        [273.15, [21, 84, 187]],   // 0 C
+        [275.15, [24, 132, 14]],   // just above 0 C
+        [291, [247, 251, 59]],
+        [298, [235, 167, 21]],
+        [311, [230, 71, 39]],
+        [328, [88, 27, 67]]
+      ])
+    }
   }
 }
 

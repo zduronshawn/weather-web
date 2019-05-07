@@ -1,9 +1,9 @@
 import request from '../utils/request';
 import * as topojson from 'topojson'
 
-export function getWeather(param) {
+export function getWeather(params) {
 
-  return request(`http://localhost:3000/${param.type}/${param.date}`)
+  return request(`http://localhost:3000/${params.type}/${params.date}`)
     .then(({ data }) => {
       return data
     })

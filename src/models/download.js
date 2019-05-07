@@ -3,7 +3,6 @@ export default {
   namespace: 'download',
   state: {
     mesh: null,
-
   },
 
   effects: {
@@ -14,8 +13,14 @@ export default {
         payload: { mesh }
       })
     },
-    *getWeather({ payload }, { call, put }) {  // eslint-disable-line
-      const result = yield call(getWeather, payload)
+    *getWeather({ payload }, { call, put, select }) {  // eslint-disable-line
+      const { params, overlayType, date } = yield select(state => state.configuration)
+      console.log(params, overlayType, date)
+      let callArr = [call(getWeather, { type: params, date })]
+      if (overlayType !== "default") {
+        callArr.push(call(getWeather, { type: overlayType, date }))
+      }
+      const result = yield callArr
       return result
     },
   },

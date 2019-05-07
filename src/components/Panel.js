@@ -23,6 +23,8 @@ class Panel extends Component {
       <div className={styles.layer}>
         <button onClick={() => this.handleChangeProjection("Orthographic")}>O</button>
         <button onClick={() => this.handleChangeProjection("Equirectangular")}>EQ</button>
+        <button onClick={() => this.handleChangeConfig({ overlayType: "temp" })}>temp</button>
+        <button onClick={() => this.handleChangeConfig({ overlayType: "default" })}>default</button>
       </div>
     )
   }

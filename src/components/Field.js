@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
 import { connect } from 'dva'
-import styles from './globe.css'
 import { fileToGrid } from './Factory'
 import * as d3 from 'd3'
 import { isValue, distortion, windIntensityColorScale, clearCanvas, spread } from '../lib/utils'
@@ -30,15 +29,17 @@ class FieldCmp extends Component {
         type: configuration.params,
         date: configuration.date
       }
-    }).then((result) => {
-      let grid = fileToGrid(result, configuration.params)
-      this.grid = grid
-      return this.interpolateField(globe, grid)
+    }).then(([vector, overlay]) => {
+      let primaryGrid = fileToGrid(vector, configuration.params)
+      let overlayGrid = overlay ? fileToGrid(overlay, configuration.overlayType) : primaryGrid
+      this.grid = {
+        primaryGrid,
+        overlayGrid
+      }
+      return this.interpolateField(globe, this.grid)
     }).then((field) => {
       this.field = field
-      this.animate(globe, field, {
-        primaryGrid: this.grid,
-      })
+      this.animate(globe, field, this.grid)
       this.drawOverlay(field)
     })
   }
@@ -51,13 +52,17 @@ class FieldCmp extends Component {
       this.field.release()
       this.renderField()
     }
+    if (nextProps.configuration.overlayType !== this.props.configuration.overlayType) {
+      this.field.release()
+      this.renderField()
+    }
   }
   interpolateField(globe, grids) {
     if (!globe || !grids) return null;
     let that = this
     var mask = new Mask(globe, this.props.view);
-    var primaryGrid = grids;
-    var overlayGrid = grids;
+    var primaryGrid = grids.primaryGrid;
+    var overlayGrid = grids.overlayGrid;
 
     return new Promise(function (resolve, reject) {
       var projection = globe.projection;

@@ -5,7 +5,7 @@ export default {
   state: {
     date: moment().subtract(3, 'days').format("YYYYMMDD"),
     orientation: "-222.73,1.75,275",
-    overlaytype: "default",
+    overlayType: "temp",
     params: "wind",
     projection: "Orthographic",
     topology: '/public/data/earth-topo.json',
