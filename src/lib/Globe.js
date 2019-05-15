@@ -201,8 +201,22 @@ class Equirectangular extends Globe {
   }
 }
 
+class Stereographic extends Globe {
+  projectionName = "Stereographic"
+  newProjection() {
+    return d3Geo.geoStereographic()
+      .rotate([-43, -20])
+      .precision(2.0)
+      .clipAngle(180 - 0.01)
+      .clipExtent([[0, 0], [this.view.width, this.view.height]]);
+  }
+  scaleExtent = () => {
+    return [200, 3000];
+  }
+}
+
 export {
-  // Atlantis,
+  Stereographic,
   Orthographic,
   Equirectangular
 }

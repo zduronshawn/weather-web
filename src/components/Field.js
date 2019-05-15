@@ -21,8 +21,8 @@ function distort(projection, λ, φ, x, y, scale, wind) {
 
 class FieldCmp extends Component {
 
-  renderField = (globe) => {
-    const { configuration } = this.props
+  renderField = (globe, props) => {
+    const { configuration } = props
     this.props.dispatch({
       type: "download/getWeather",
       payload: {
@@ -46,15 +46,15 @@ class FieldCmp extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.mapRenderState === 1 && this.props.mapRenderState === 0) {
-      this.renderField(nextProps.globe)
+      this.renderField(nextProps.globe, nextProps)
     }
     if (nextProps.globe.projectionName !== this.props.globe.projectionName) {
       this.field.release()
-      this.renderField()
+      this.renderField(nextProps.globe, nextProps)
     }
     if (nextProps.configuration.overlayType !== this.props.configuration.overlayType) {
       this.field.release()
-      this.renderField()
+      this.renderField(nextProps.globe, nextProps)
     }
   }
   interpolateField(globe, grids) {
@@ -141,6 +141,9 @@ class FieldCmp extends Component {
     var colorStyles = windIntensityColorScale(cst.INTENSITY_SCALE_STEP, grids.primaryGrid.particles.maxIntensity);
     var buckets = colorStyles.map(function () { return []; });
     var particleCount = Math.round(bounds.width * cst.PARTICLE_MULTIPLIER);
+    if (this.props.globe.projectionName === "Stereographic") {
+      particleCount = particleCount * cst.PARTICLE_REDUCTION
+    }
     var fadeFillStyle = "rgba(0, 0, 0, 0.97)";
     console.log("particle count: " + particleCount);
     var particles = [];
