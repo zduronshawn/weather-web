@@ -216,7 +216,7 @@ class FieldCmp extends Component {
     let that = this;
     (function frame() {
       try {
-        if (that.props.mapRenderState === 0) {
+        if (that.props.mapRenderState === 0 || that.field.columns.length === 0) {
           field.release()
           return
         }

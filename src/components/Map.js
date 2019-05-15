@@ -114,7 +114,6 @@ export class Map extends Component {
             this.handleMoveEnd()
           }
         }, cst.MOVE_END_WAIT)()
-        onEnd()
         op = null
       })
   }
