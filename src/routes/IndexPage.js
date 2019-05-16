@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import Globle from '../components/Globe'
 import Panel from '../components/Panel'
 import styles from './IndexPage.css';
+import 'antd/dist/antd.css';
 
 class IndexPage extends Component {
   componentDidMount = () => {

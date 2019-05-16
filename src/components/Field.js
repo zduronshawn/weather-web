@@ -7,6 +7,7 @@ import { isValue, distortion, windIntensityColorScale, clearCanvas, spread } fro
 import * as cst from '../utils/constant'
 import Field from '../lib/Field'
 import Mask from '../lib/Mask'
+import { message } from 'antd'
 
 function distort(projection, λ, φ, x, y, scale, wind) {
   var u = wind[0] * scale;
@@ -30,6 +31,14 @@ class FieldCmp extends Component {
         date: configuration.date
       }
     }).then(([vector, overlay]) => {
+      if (vector && vector.code === -1) {
+        message.error(`${configuration.date}的${configuration.params}文件不存在`)
+        return
+      }
+      if (overlay && overlay.code === -1) {
+        message.error(`${configuration.date}的${configuration.overlayType}文件不存在`)
+        return
+      }
       let primaryGrid = fileToGrid(vector, configuration.params)
       let overlayGrid = overlay ? fileToGrid(overlay, configuration.overlayType) : primaryGrid
       this.grid = {
@@ -49,14 +58,22 @@ class FieldCmp extends Component {
       this.renderField(nextProps.globe, nextProps)
     }
     if (nextProps.globe.projectionName !== this.props.globe.projectionName) {
-      this.field.release()
-      this.renderField(nextProps.globe, nextProps)
+      this.handleRedraw(nextProps)
     }
     if (nextProps.configuration.overlayType !== this.props.configuration.overlayType) {
-      this.field.release()
-      this.renderField(nextProps.globe, nextProps)
+      this.handleRedraw(nextProps)
+    }
+    if (nextProps.configuration.date !== this.props.configuration.date) {
+      this.handleRedraw(nextProps)
     }
   }
+  handleRedraw = (props) => {
+    if (this.field) {
+      this.field.release()
+    }
+    this.renderField(props.globe, props)
+  }
+
   interpolateField(globe, grids) {
     if (!globe || !grids) return null;
     let that = this

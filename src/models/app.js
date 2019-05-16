@@ -21,7 +21,8 @@ export default {
     view: defaultView,
     width: defaultView.width,
     height: defaultView.height,
-    globe: new Globes["Orthographic"](defaultView)
+    globe: new Globes["Orthographic"](defaultView),
+    showMenu: false
   },
   subscriptions: {
     setup({ dispatch, history }) {  // eslint-disable-line
