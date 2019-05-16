@@ -20,6 +20,17 @@ export class Map extends Component {
     let target = d3.select("#display")
     target.call(this._drag());
     target.call(this._zoom());
+    target.on("click", () => {
+      let point = d3.mouse(this.target.node())
+      let coord = globe.projection.invert(point)
+      this.drawLocationMark(point, coord)
+      this.props.dispatch({
+        type: "configuration/save",
+        payload: {
+          activeLocation: { point, coord }
+        }
+      })
+    })
   }
 
   componentWillReceiveProps = (newProps) => {
@@ -59,6 +70,15 @@ export class Map extends Component {
     d3.selectAll("path").attr("d", d3.geoPath().projection(globe.projection).pointRadius(7)); //fix update proejction bug
     onEnd()
   }
+  drawLocationMark = (point, coord) => {
+    if (coord && _.isFinite(coord[0]) && _.isFinite(coord[1])) {
+      var mark = d3.select(".location-mark");
+      if (!mark.node()) {
+        mark = d3.select("#foreground").append("path").attr("class", "location-mark");
+      }
+      mark.datum({ type: "Point", coordinates: coord }).attr("d", this.path);
+    }
+  }
   // turn to use low resolution
   handleMoving = () => {
     const { mesh } = this.props
@@ -82,9 +102,10 @@ export class Map extends Component {
       manipulator: globe.manipulator(startMouse, startScale)
     };
   }
+
   _drag = () => {
     const { globe } = this.props
-    const { onStart, onEnd } = this.props
+    const { onStart } = this.props
     let op = null
     return D3Drag.drag()
       .on("start", () => {

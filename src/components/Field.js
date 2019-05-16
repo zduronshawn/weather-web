@@ -66,6 +66,9 @@ class FieldCmp extends Component {
     if (nextProps.configuration.date !== this.props.configuration.date) {
       this.handleRedraw(nextProps)
     }
+    if (nextProps.configuration.activeLocation !== this.props.configuration.activeLocation) {
+      // this.handleRedraw(nextProps)
+    }
   }
   handleRedraw = (props) => {
     if (this.field) {

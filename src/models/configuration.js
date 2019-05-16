@@ -8,6 +8,7 @@ export default {
     overlayType: "temp",
     params: "wind",
     topology: '/public/data/earth-topo.json',
+    activeLocation: null
   },
 
   effects: {},
