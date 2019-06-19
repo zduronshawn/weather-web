@@ -87,7 +87,6 @@ class FieldCmp extends Component {
     return new Promise(function (resolve, reject) {
       var projection = globe.projection;
       var bounds = globe.bounds(that.props.view);
-      // How fast particles move on the screen (arbitrary value chosen for aesthetics).
       var velocityScale = bounds.height * primaryGrid.particles.velocityScale;
 
       var columns = [];
@@ -164,7 +163,7 @@ class FieldCmp extends Component {
     if (this.props.globe.projectionName === "Stereographic") {
       particleCount = particleCount * cst.PARTICLE_REDUCTION
     }
-    var fadeFillStyle = "rgba(0, 0, 0, 0.97)";
+    var fadeFillStyle = "rgba(0, 0, 0, 0.95)";
     console.log("particle count: " + particleCount);
     var particles = [];
     for (var i = 0; i < particleCount; i++) {
@@ -211,10 +210,10 @@ class FieldCmp extends Component {
 
     function draw() {
       // Fade existing particle trails.
-      var prev = g.globalCompositeOperation;
+      // var prev = g.globalCompositeOperation;
       g.globalCompositeOperation = "destination-in";
       g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-      g.globalCompositeOperation = prev;
+      g.globalCompositeOperation = "source-over";
 
       // Draw new particle trails.
       buckets.forEach(function (bucket, i) {

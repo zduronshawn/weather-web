@@ -45,7 +45,7 @@ class Globe {
     return { x: x, y: y, xMax: xMax, yMax: yMax, width: xMax - x + 1, height: yMax - y + 1 };
   }
   scaleExtent = () => {
-    return [300, 3000];
+    return [300, 2000];
   }
 
   bounds = (view) => {
@@ -153,39 +153,39 @@ class Orthographic extends Globe {
   newProjection() {
     return d3Geo.geoOrthographic().rotate(this._currentPosition()).precision(0.1).clipAngle(90);
   }
-  defineMap = (mapSvg, foregroundSvg) => {
-    let path = d3Geo.geoPath().projection(this.projection);
-    let defs = mapSvg.append("defs");
-    let gradientFill = defs.append("radialGradient")
-      .attr("id", "orthographic-fill")
-      .attr("gradientUnits", "objectBoundingBox")
-      .attr("cx", "50%").attr("cy", "49%").attr("r", "50%");
-    gradientFill.append("stop").attr("stop-color", "#303030").attr("offset", "69%");
-    gradientFill.append("stop").attr("stop-color", "#202020").attr("offset", "91%");
-    gradientFill.append("stop").attr("stop-color", "#000005").attr("offset", "96%");
-    defs.append("path")
-      .attr("id", "sphere")
-      .datum({ type: "Sphere" })
-      .attr("d", path);
-    mapSvg.append("use")
-      .attr("xlink:href", "#sphere")
-      .attr("fill", "url(#orthographic-fill)");
-    mapSvg.append("path")
-      .attr("class", "graticule")
-      .datum(d3Geo.geoGraticule())
-      .attr("d", path);
-    mapSvg.append("path")
-      .attr("class", "hemisphere")
-      .datum(d3Geo.geoGraticule().stepMinor([0, 90]).stepMajor([0, 90]))
-      .attr("d", path);
-    mapSvg.append("path")
-      .attr("class", "coastline");
-    mapSvg.append("path")
-      .attr("class", "lakes");
-    foregroundSvg.append("use")
-      .attr("xlink:href", "#sphere")
-      .attr("class", "foreground-sphere");
-  }
+  // defineMap = (mapSvg, foregroundSvg) => {
+  //   let path = d3Geo.geoPath().projection(this.projection);
+  //   let defs = mapSvg.append("defs");
+  //   let gradientFill = defs.append("radialGradient")
+  //     .attr("id", "orthographic-fill")
+  //     .attr("gradientUnits", "objectBoundingBox")
+  //     .attr("cx", "50%").attr("cy", "49%").attr("r", "50%");
+  //   gradientFill.append("stop").attr("stop-color", "#303030").attr("offset", "69%");
+  //   gradientFill.append("stop").attr("stop-color", "#202020").attr("offset", "91%");
+  //   gradientFill.append("stop").attr("stop-color", "#000005").attr("offset", "96%");
+  //   defs.append("path")
+  //     .attr("id", "sphere")
+  //     .datum({ type: "Sphere" })
+  //     .attr("d", path);
+  //   mapSvg.append("use")
+  //     .attr("xlink:href", "#sphere")
+  //     .attr("fill", "url(#orthographic-fill)");
+  //   mapSvg.append("path")
+  //     .attr("class", "graticule")
+  //     .datum(d3Geo.geoGraticule())
+  //     .attr("d", path);
+  //   mapSvg.append("path")
+  //     .attr("class", "hemisphere")
+  //     .datum(d3Geo.geoGraticule().stepMinor([0, 90]).stepMajor([0, 90]))
+  //     .attr("d", path);
+  //   mapSvg.append("path")
+  //     .attr("class", "coastline");
+  //   mapSvg.append("path")
+  //     .attr("class", "lakes");
+  //   foregroundSvg.append("use")
+  //     .attr("xlink:href", "#sphere")
+  //     .attr("class", "foreground-sphere");
+  // }
   locate = (coord) => {
     return [-coord[0], -coord[1], this.projection.rotate()[2]];
   }
@@ -197,7 +197,7 @@ class Equirectangular extends Globe {
     return d3Geo.geoEquirectangular().rotate(this._currentPosition()).precision(0.1);
   }
   scaleExtent = () => {
-    return [200, 3000];
+    return [200, 2000];
   }
 }
 
@@ -211,7 +211,7 @@ class Stereographic extends Globe {
       .clipExtent([[0, 0], [this.view.width, this.view.height]]);
   }
   scaleExtent = () => {
-    return [200, 3000];
+    return [200, 2000];
   }
 }
 
