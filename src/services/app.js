@@ -2,12 +2,17 @@ import request from '../utils/request';
 import * as topojson from 'topojson'
 
 export function getWeather(params) {
-
-  return request(`http://localhost:3000/${params.type}/${params.date}`)
+  return request(`/public/data/weather/${params.type}-json-20190612.json`)
     .then(({ data }) => {
       return data
     })
 }
+// export function getWeather(params) {
+//   return request(`http://localhost:3000/${params.type}/${params.date}`)
+//     .then(({ data }) => {
+//       return data
+//     })
+// }
 
 export function getMesh() {
   return request("/public/data/earth-topo.json")
