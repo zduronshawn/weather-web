@@ -13,7 +13,7 @@ export default class Field {
     this.overlay = mask.imageData
   }
 
-  getVector(x, y) {
+  getVector(x, y) { 
     let column = this.columns[Math.round(x)];
     return column && column[Math.round(y)] || cst.NULL_WIND_VECTOR;
   }
