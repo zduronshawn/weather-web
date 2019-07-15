@@ -4,7 +4,7 @@
     "start": "roadhog server",
     "build": "roadhog build",
     "lint": "eslint --ext .js src test",
-    "precommit": "npm run lint"
+    "precommit": "lint-staged"
   },
   "dependencies": {
     "@sentry/browser": "^5.5.0",
@@ -31,7 +31,11 @@
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0",
     "husky": "^0.12.0",
+    "lint-staged": "^9.2.0",
     "redbox-react": "^1.4.3",
     "roadhog": "^2.5.0-beta.4"
+  },
+  "lint-staged": {
+    "src/**/*.js": "eslint"
   }
 }
