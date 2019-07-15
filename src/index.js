@@ -1,7 +1,9 @@
 import dva from 'dva';
+import * as Sentry from '@sentry/browser';
 import { createBrowserHistory } from 'history';
 import './index.css';
 
+Sentry.init({dsn: "https://bd63b494eefd4bd6a5425a7a050bf656@sentry.io/1504743"})
 // 1. Initialize
 const app = dva({
   history: createBrowserHistory()
