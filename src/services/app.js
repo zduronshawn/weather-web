@@ -2,7 +2,7 @@ import request from '../utils/request';
 import * as topojson from 'topojson'
 
 export function getWeather(params) {
-  return request(`/public/data/weather/${params.type}-json-20190612.json`)
+  return request(`/public/data/weather/${params.type}-json-20190611.json`)
     .then(({ data }) => {
       return data
     })
